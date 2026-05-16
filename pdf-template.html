@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Content Editor - Shivsrushti Cashbook</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a0a00 0%, #2d1810 50%, #3d1f12 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255,255,255,0.97);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            margin-top: 20px;
+        }
+        h1 {
+            background: linear-gradient(135deg, #5a2d0c, #8b4513, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .tagline {
+            text-align: center;
+            color: #8b4513;
+            font-size: 14px;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 25px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #fffaf5 0%, #fef5eb 100%);
+            box-shadow: 0 5px 20px rgba(139,69,19,0.1);
+            border-left: 5px solid #ff8c00;
+        }
+        .section h2 {
+            color: #5a2d0c;
+            margin-top: 0;
+            font-size: 18px;
+            font-weight: 700;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,140,0,0.2);
+        }
+        .editable {
+            border: 2px solid #e5d5c5;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 10px;
+            min-height: 35px;
+            background: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .editable:hover {
+            border-color: #ffd700;
+        }
+        .editable:focus {
+            outline: none;
+            border-color: #ff8c00;
+            background: #fffaf5;
+            box-shadow: 0 0 15px rgba(255,140,0,0.2);
+        }
+        .label {
+            font-weight: 600;
+            margin-top: 12px;
+            display: block;
+            color: #5a2d0c;
+            font-size: 13px;
+        }
+        button {
+            background: linear-gradient(135deg, #ff8c00, #e67300);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 8px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,140,0,0.3);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #e67300, #cc6600);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255,140,0,0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .instructions {
+            background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+            padding: 18px;
+            border-left: 5px solid #22c55e;
+            margin-bottom: 25px;
+            border-radius: 0 12px 12px 0;
+        }
+        .instructions strong { color: #16a34a; }
+        .instructions code {
+            background: rgba(22,163,74,0.1);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+        .preview-box {
+            background: white;
+            border: 2px solid #e5d5c5;
+            padding: 20px;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+            border-radius: 10px;
+        }
+        #codeOutput {
+            display: none;
+        }
+        textarea {
+            width: 100%;
+            height: 500px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            padding: 15px;
+            border: 2px solid #e5d5c5;
+            border-radius: 10px;
+            background: #fffaf5;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #ff8c00;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(145deg, #1a0a00, #3d1f12);
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚩 PDF Content Editor - Shivsrushti Cashbook</h1>
+        <p class="tagline">Customize your PDF content with attractive saffron-maroon-gold theme</p>
+        
+        <div class="instructions">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>Below madhe sagla text direct click kara ani edit kara (HTML tags madhe ahe)</li>
+                <li>Changes pahun "Generate PDF Code" button click kara</li>
+                <li>"Copy Code" button click kara ani <code>script.js</code> madhe replace kara</li>
+            </ol>
+        </div>
+
+        <!-- Cover Page Content -->
+        <div class="section">
+            <h2>📄 Cover Page Content</h2>
+            
+            <span class="label">Main Title:</span>
+            <div class="editable" id="coverTitle" contenteditable="true">GANPATI FESTIVAL CASHBOOK</div>
+            
+            <span class="label">Organization Name:</span>
+            <div class="editable" id="coverOrgName" contenteditable="true">ShivSrushti Hindu Tarun mitra mandal 🚩</div>
+            
+            <span class="label">Year Label (text before year number):</span>
+            <div class="editable" id="coverYearLabel" contenteditable="true">Year: </div>
+        </div>
+
+        <!-- Header for Inner Pages -->
+        <div class="section">
+            <h2>📑 Inner Page Header</h2>
+            
+            <span class="label">Header Title:</span>
+            <div class="editable" id="headerTitle" contenteditable="true">GANPATI FESTIVAL CASHBOOK</div>
+            
+            <span class="label">Header Subtitle (text before year):</span>
+            <div class="editable" id="headerSubtitle" contenteditable="true">Shivsrushti Hindu Tarun Mitra Mandal - Year: </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="section">
+            <h2>📝 Footer Content</h2>
+            
+            <span class="label">Footer Text:</span>
+            <div class="editable" id="footerText" contenteditable="true">Shivsrushti Hindu Tarun Mitra Mandal - Ganpati Cashbook</div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="section">
+            <h2>💰 Summary Section</h2>
+            
+            <span class="label">Summary Title (text before year):</span>
+            <div class="editable" id="summaryTitle" contenteditable="true">SUMMARY - Year: </div>
+            
+            <span class="label">Cash In Label:</span>
+            <div class="editable" id="cashInLabel" contenteditable="true">Total Cash In (+)</div>
+            
+            <span class="label">Cash Out Label:</span>
+            <div class="editable" id="cashOutLabel" contenteditable="true">Total Cash Out (-)</div>
+            
+            <span class="label">Balance Label:</span>
+            <div class="editable" id="balanceLabel" contenteditable="true">Final Balance</div>
+        </div>
+
+        <!-- Notes Page -->
+        <div class="section">
+            <h2>📋 Notes Page</h2>
+            
+            <span class="label">Notes Title:</span>
+            <div class="editable" id="notesTitle" contenteditable="true">NOTES</div>
+            
+            <span class="label">Note 1:</span>
+            <div class="editable" id="note1" contenteditable="true">Update balance after every entry</div>
+            
+            <span class="label">Note 2:</span>
+            <div class="editable" id="note2" contenteditable="true">Maintain separate tracking for Cash and Online</div>
+            
+            <span class="label">Note 3:</span>
+            <div class="editable" id="note3" contenteditable="true">Verify entries weekly</div>
+            
+            <span class="label">Note 4:</span>
+            <div class="editable" id="note4" contenteditable="true">Generate final report after festival</div>
+            
+            <span class="label">Note 5:</span>
+            <div class="editable" id="note5" contenteditable="true">Keep all bills/receipts for record</div>
+            
+            <span class="label">Footer Note 1:</span>
+            <div class="editable" id="footerNote1" contenteditable="true">All amounts are in Indian Rupees (₹)</div>
+            
+            <span class="label">Footer Note 2:</span>
+            <div class="editable" id="footerNote2" contenteditable="true">This is a computer-generated report from Ganpati Festival Cashbook</div>
+            
+            <span class="label">Footer Note 3:</span>
+            <div class="editable" id="footerNote3" contenteditable="true">Shivsrushti Hindu Tarun Mitra Mandal – Ganeshotsav</div>
+        </div>
+
+        <!-- Signatures -->
+        <div class="section">
+            <h2>✍️ Signatures</h2>
+            
+            <span class="label">Signature 1 (Prepared By):</span>
+            <div class="editable" id="sig1" contenteditable="true">Prepared By</div>
+            
+            <span class="label">Signature 2 (Verified By):</span>
+            <div class="editable" id="sig2" contenteditable="true">Verified By</div>
+            
+            <span class="label">Signature 3 (Approved By):</span>
+            <div class="editable" id="sig3" contenteditable="true">Approved By</div>
+        </div>
+
+        <!-- Table Headers -->
+        <div class="section">
+            <h2>📊 Table Headers</h2>
+            
+            <span class="label">Column 1:</span>
+            <div class="editable" id="col1" contenteditable="true">#</div>
+            
+            <span class="label">Column 2:</span>
+            <div class="editable" id="col2" contenteditable="true">Remark</div>
+            
+            <span class="label">Column 3:</span>
+            <div class="editable" id="col3" contenteditable="true">Date</div>
+            
+            <span class="label">Column 4:</span>
+            <div class="editable" id="col4" contenteditable="true">Mode</div>
+            
+            <span class="label">Column 5:</span>
+            <div class="editable" id="col5" contenteditable="true">Cash In (+)</div>
+            
+            <span class="label">Column 6:</span>
+            <div class="editable" id="col6" contenteditable="true">Cash Out (-)</div>
+            
+            <span class="label">Column 7:</span>
+            <div class="editable" id="col7" contenteditable="true">Balance</div>
+        </div>
+
+        <!-- Transaction Records Title -->
+        <div class="section">
+            <h2>📈 Transaction Records Title</h2>
+            
+            <span class="label">Title (text before year):</span>
+            <div class="editable" id="transTitle" contenteditable="true">TRANSACTION RECORDS - Year: </div>
+        </div>
+
+        <div class="btn-container">
+            <button onclick="generateCode()">🔄 Generate PDF Code</button>
+            <button onclick="copyCode()">📋 Copy Code</button>
+        </div>
+
+        <div class="section" id="codeOutput">
+            <h2>📦 Generated Code (Copy & Paste in script.js)</h2>
+            <p>Copy the code below and replace the <code>generatePDFForYear</code> and <code>generatePDFDocument</code> functions in your <code>script.js</code> file.</p>
+            <textarea id="generatedCode"></textarea>
+        </div>
+    </div>
+
+    <script>
+        function generateCode() {
+            // Get all values from editable divs
+            const coverTitle = document.getElementById('coverTitle').innerText;
+            const coverOrgName = document.getElementById('coverOrgName').innerText;
+            const coverYearLabel = document.getElementById('coverYearLabel').innerText;
+            const headerTitle = document.getElementById('headerTitle').innerText;
+            const headerSubtitle = document.getElementById('headerSubtitle').innerText;
+            const footerText = document.getElementById('footerText').innerText;
+            const summaryTitle = document.getElementById('summaryTitle').innerText;
+            const cashInLabel = document.getElementById('cashInLabel').innerText;
+            const cashOutLabel = document.getElementById('cashOutLabel').innerText;
+            const balanceLabel = document.getElementById('balanceLabel').innerText;
+            const notesTitle = document.getElementById('notesTitle').innerText;
+            const note1 = document.getElementById('note1').innerText;
+            const note2 = document.getElementById('note2').innerText;
+            const note3 = document.getElementById('note3').innerText;
+            const note4 = document.getElementById('note4').innerText;
+            const note5 = document.getElementById('note5').innerText;
+            const footerNote1 = document.getElementById('footerNote1').innerText;
+            const footerNote2 = document.getElementById('footerNote2').innerText;
+            const footerNote3 = document.getElementById('footerNote3').innerText;
+            const sig1 = document.getElementById('sig1').innerText;
+            const sig2 = document.getElementById('sig2').innerText;
+            const sig3 = document.getElementById('sig3').innerText;
+            const col1 = document.getElementById('col1').innerText;
+            const col2 = document.getElementById('col2').innerText;
+            const col3 = document.getElementById('col3').innerText;
+            const col4 = document.getElementById('col4').innerText;
+            const col5 = document.getElementById('col5').innerText;
+            const col6 = document.getElementById('col6').innerText;
+            const col7 = document.getElementById('col7').innerText;
+            const transTitle = document.getElementById('transTitle').innerText;
+
+            const code = `async function generatePDFForYear(entries, yearLabel) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 8;
+    const contentWidth = pageWidth - margin * 2;
+    
+    let totalCashIn = 0;
+    let totalCashOut = 0;
+    let runningBalance = 0;
+    
+    const tableData = entries.map((entry, index) => {
+        runningBalance += entry.cash_in - entry.cash_out;
+        totalCashIn += entry.cash_in;
+        totalCashOut += entry.cash_out;
+        
+        return [
+            index + 1,
+            entry.name,
+            formatDate(entry.date),
+            entry.mode,
+            entry.cash_in > 0 ? formatPDFCurrency(entry.cash_in) : '-',
+            entry.cash_out > 0 ? formatPDFCurrency(entry.cash_out) : '-',
+            formatPDFCurrency(runningBalance)
+        ];
+    });
+    
+    const finalBalance = totalCashIn - totalCashOut;
+    
+    let logoDataURL = null;
+    try {
+        logoDataURL = await loadLogo();
+    } catch (e) {
+        console.warn('Logo not loaded:', e);
+    }
+    
+    return generatePDFDocument(doc, tableData, yearLabel, totalCashIn, totalCashOut, finalBalance, pageWidth, pageHeight, margin, contentWidth, logoDataURL);
+}
+
+function generatePDFDocument(doc, tableData, yearLabel, totalCashIn, totalCashOut, finalBalance, pageWidth, pageHeight, margin, contentWidth, logoDataURL) {
+    const C = {
+        saffron: [255, 140, 0],
+        saffronDark: [200, 110, 0],
+        gold: [255, 215, 0],
+        maroon: [90, 45, 12],
+        maroonDark: [26, 10, 0],
+        brown: [139, 69, 19],
+        white: [255, 255, 255],
+        cream: [255, 250, 245],
+        creamDark: [254, 245, 235],
+        textDark: [26, 26, 46],
+        textMid: [102, 102, 102],
+        textLight: [150, 150, 150],
+        green: [22, 163, 74],
+        greenBg: [240, 253, 244],
+        red: [220, 38, 38],
+        redBg: [254, 242, 242],
+        purple: [147, 51, 234],
+        purpleBg: [250, 245, 255],
+        line: [229, 213, 197],
+        lineLight: [240, 229, 216]
+    };
+    
+    function addCoverHeader(doc) {
+        // Background gradient effect using rectangles
+        doc.setFillColor(C.maroonDark[0], C.maroonDark[1], C.maroonDark[2]);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+        
+        // Decorative top band with gradient effect
+        doc.setFillColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+        doc.rect(0, 0, pageWidth, 35, 'F');
+        
+        // Second decorative band
+        doc.setFillColor(C.maroon[0], C.maroon[1], C.maroon[2]);
+        doc.rect(0, 35, pageWidth, 3, 'F');
+        
+        // Decorative border
+        doc.setDrawColor(C.gold[0], C.gold[1], C.gold[2]);
+        doc.setLineWidth(1.5);
+        doc.rect(10, 10, pageWidth - 20, pageHeight - 20, 'S');
+        
+        // Inner decorative border
+        doc.setLineWidth(0.5);
+        doc.rect(12, 12, pageWidth - 24, pageHeight - 24, 'S');
+        
+        // Decorative corners (small squares at corners)
+        const cornerSize = 3;
+        doc.setFillColor(C.gold[0], C.gold[1], C.gold[2]);
+        // Top-left
+        doc.rect(10, 10, cornerSize, cornerSize, 'F');
+        // Top-right
+        doc.rect(pageWidth - 10 - cornerSize, 10, cornerSize, cornerSize, 'F');
+        // Bottom-left
+        doc.rect(10, pageHeight - 10 - cornerSize, cornerSize, cornerSize, 'F');
+        // Bottom-right
+        doc.rect(pageWidth - 10 - cornerSize, pageHeight - 10 - cornerSize, cornerSize, cornerSize, 'F');
+        
+        // Om symbol (using text)
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(C.gold[0], C.gold[1], C.gold[2]);
+        doc.text('|| हर हर महादेव 🔱 ||', pageWidth / 2, 40, { align: 'center' });
+        
+        // Main title
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(C.gold[0], C.gold[1], C.gold[2]);
+        doc.text('${coverTitle}', pageWidth / 2, 65, { align: 'center' });
+        
+        // Decorative line under title
+        doc.setDrawColor(C.gold[0], C.gold[1], C.gold[2]);
+        doc.setLineWidth(0.8);
+        doc.line(pageWidth / 2 - 50, 68, pageWidth / 2 + 50, 68);
+        
+        // Organization name
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(C.white[0], C.white[1], C.white[2]);
+        doc.text('${coverOrgName}', pageWidth / 2, 80, { align: 'center' });
+        
+        // Year label with decorative background
+        doc.setFillColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+        doc.roundedRect(pageWidth / 2 - 35, 88, 70, 10, 2, 2, 'F');
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(C.white[0], C.white[1], C.white[2]);
+        doc.text('${coverYearLabel}' + yearLabel, pageWidth / 2, 95, { align: 'center' });
+        
+        // Decorative bottom band
+        doc.setFillColor(245, 240, 235);
+        doc.rect(0, pageHeight - 35, pageWidth, 35, 'F');
+        
+        // Bottom decorative line
+        doc.setFillColor(218, 210, 195);
+        doc.rect(0, pageHeight - 38, pageWidth, 3, 'F');
+        
+        // Footer text
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(90, 60, 30);
+        doc.text('ShivSrushti Festival Cashbook System', pageWidth / 2, pageHeight - 25, { align: 'center' });
+        
+        doc.setFontSize(7);
+        doc.setTextColor(110, 75, 40);
+        doc.text('ॐ गण गणपतये नमः', pageWidth / 2, pageHeight - 18, { align: 'center' });
+    }
+    
+    function addPageHeader(doc) {
+        doc.setFillColor(C.white[0], C.white[1], C.white[2]);
+        doc.rect(0, 0, pageWidth, 10, 'F');
+        
+        doc.setFillColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+        doc.rect(0, 10, pageWidth, 1.5, 'F');
+        
+        if (logoDataURL) {
+            try {
+                const logoHeight = 9;
+                const logoWidth = 9;
+                const logoX = margin;
+                const logoY = 0.5;
+                doc.addImage(logoDataURL, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+            } catch (e) {
+                console.warn('Failed to add logo to header:', e);
+            }
+        }
+        
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+        doc.text('${headerTitle}', pageWidth / 2, 5, { align: 'center' });
+        
+        doc.setFontSize(5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(C.textLight[0], C.textLight[1], C.textLight[2]);
+        doc.text('${headerSubtitle}' + yearLabel, pageWidth / 2, 8.5, { align: 'center' });
+    }
+    
+    function addPageFooter(doc, pageNum, totalPages) {
+        const fy = pageHeight - 6;
+        doc.setDrawColor(C.line[0], C.line[1], C.line[2]);
+        doc.setLineWidth(0.3);
+        doc.line(margin, fy - 2.5, pageWidth - margin, fy - 2.5);
+        
+        doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(C.textLight[0], C.textLight[1], C.textLight[2]);
+        doc.text('|| हर हर महादेव 🔱 ||  ${footerText}', margin, fy);
+        doc.text('Page ' + pageNum + ' of ' + totalPages, pageWidth - margin, fy, { align: 'right' });
+    }
+    
+    function drawSummarySection(doc, yPos) {
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(C.maroon[0], C.maroon[1], C.maroon[2]);
+        doc.text('${summaryTitle}' + yearLabel, margin, yPos);
+        yPos += 2;
+        
+        doc.setDrawColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+        doc.setLineWidth(0.6);
+        doc.line(margin, yPos, margin + 25, yPos);
+        yPos += 3;
+        
+        const boxH = 16;
+        doc.setFillColor(C.cream[0], C.cream[1], C.cream[2]);
+        doc.roundedRect(margin, yPos, contentWidth, boxH, 2, 2, 'F');
+        
+        doc.setDrawColor(C.line[0], C.line[1], C.line[2]);
+        doc.setLineWidth(0.3);
+        doc.line(margin, yPos, margin, yPos + boxH);
+        doc.line(pageWidth - margin, yPos, pageWidth - margin, yPos + boxH);
+        
+        const colW = contentWidth / 3;
+        doc.line(margin + colW, yPos + 2, margin + colW, yPos + boxH - 2);
+        doc.line(margin + colW * 2, yPos + 2, margin + colW * 2, yPos + boxH - 2);
+        
+        const drawSumItem = (x, label, value, color) => {
+            doc.setFontSize(5.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(C.textLight[0], C.textLight[1], C.textLight[2]);
+            doc.text(label, x, yPos + 6);
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(color[0], color[1], color[2]);
+            doc.text(value, x, yPos + 12);
+        };
+        
+        drawSumItem(margin + 5, '${cashInLabel}', formatPDFCurrency(totalCashIn), C.green);
+        drawSumItem(margin + colW + 5, '${cashOutLabel}', formatPDFCurrency(totalCashOut), C.red);
+        drawSumItem(margin + colW * 2 + 5, '${balanceLabel}', formatPDFCurrency(finalBalance), C.purple);
+        
+        return yPos + boxH + 5;
+    }
+    
+    function drawSignatures(doc) {
+        const sy = pageHeight - 30;
+        
+        doc.setDrawColor(C.line[0], C.line[1], C.line[2]);
+        doc.setLineWidth(0.4);
+        
+        const sw = 40;
+        
+        doc.line(margin + 8, sy, margin + 8 + sw, sy);
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(C.textLight[0], C.textLight[1], C.textLight[2]);
+        doc.text('${sig1}', margin + 8 + sw / 2, sy + 5, { align: 'center' });
+        
+        doc.line(pageWidth / 2 - sw / 2, sy, pageWidth / 2 + sw / 2, sy);
+        doc.text('${sig2}', pageWidth / 2, sy + 5, { align: 'center' });
+        
+        doc.line(pageWidth - margin - 8 - sw, sy, pageWidth - margin - 8, sy);
+        doc.text('${sig3}', pageWidth - margin - 8 - sw / 2, sy + 5, { align: 'center' });
+    }
+    
+    function drawNotesPage(doc) {
+        doc.addPage();
+        addPageHeader(doc);
+        
+        let yPos = 22;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(C.maroon[0], C.maroon[1], C.maroon[2]);
+        doc.text('${notesTitle}', margin, yPos);
+        yPos += 2;
+        
+        doc.setDrawColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+        doc.setLineWidth(0.6);
+        doc.line(margin, yPos, margin + 16, yPos);
+        yPos += 6;
+        
+        const notes = [
+            '${note1}',
+            '${note2}',
+            '${note3}',
+            '${note4}',
+            '${note5}'
+        ];
+        
+        notes.forEach((note, i) => {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+            doc.text((i + 1) + '.', margin + 5, yPos);
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(C.textMid[0], C.textMid[1], C.textMid[2]);
+            doc.text(note, margin + 12, yPos);
+            
+            yPos += 8;
+        });
+        
+        yPos += 10;
+        
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(C.textLight[0], C.textLight[1], C.textLight[2]);
+        doc.text('${footerNote1}', margin, yPos);
+        yPos += 6;
+        doc.text('${footerNote2}', margin, yPos);
+        yPos += 6;
+        doc.text('${footerNote3}', margin, yPos);
+        
+        drawSignatures(doc);
+    }
+    
+    addCoverHeader(doc);
+    
+    let yPos = 35;
+    yPos = drawSummarySection(doc, yPos);
+    
+    yPos += 4;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(C.maroon[0], C.maroon[1], C.maroon[2]);
+    doc.text('${transTitle}' + yearLabel, margin, yPos);
+    
+    doc.setDrawColor(C.saffron[0], C.saffron[1], C.saffron[2]);
+    doc.setLineWidth(0.5);
+    doc.line(margin, yPos + 1.5, margin + 65, yPos + 1.5);
+    yPos += 5;
+    
+    doc.autoTable({
+        startY: yPos,
+        head: [[
+            '${col1}',
+            '${col2}',
+            '${col3}',
+            '${col4}',
+            '${col5}',
+            '${col6}',
+            '${col7}'
+        ]],
+        body: tableData,
+        theme: 'grid',
+        headStyles: {
+            fillColor: C.maroon,
+            textColor: C.gold,
+            fontStyle: 'bold',
+            fontSize: 10,
+            halign: 'center',
+            valign: 'middle',
+            cellPadding: 4
+        },
+        bodyStyles: {
+            fontSize: 10,
+            cellPadding: 3,
+            valign: 'middle',
+            textColor: C.textMid,
+            lineColor: C.lineLight,
+            lineWidth: 0.15
+        },
+        alternateRowStyles: {
+            fillColor: C.creamDark
+        },
+        columnStyles: {
+            0: { halign: 'center', cellWidth: 12, fontStyle: 'bold', textColor: C.textLight },
+            1: { cellWidth: 54, fontStyle: 'bold', textColor: C.textDark },
+            2: { cellWidth: 28, halign: 'center', fontSize: 10 },
+            3: { cellWidth: 14, halign: 'center', fontSize: 10 },
+            4: { halign: 'right', cellWidth: 28, textColor: C.green, fontStyle: 'bold', fontSize: 10 },
+            5: { halign: 'right', cellWidth: 28, textColor: C.red, fontStyle: 'bold', fontSize: 10 },
+            6: { halign: 'right', cellWidth: 32, textColor: C.purple, fontStyle: 'bold', fontSize: 7 }
+        },
+        margin: { left: margin, right: margin },
+        styles: {
+            overflow: 'linebreak'
+        },
+        didDrawPage: function(data) {
+            addPageHeader(doc);
+            const totalPagesTemp = doc.internal.getNumberOfPages();
+            addPageFooter(doc, totalPagesTemp, '___');
+        }
+    });
+    
+    drawNotesPage(doc);
+    
+    let totalPages = doc.internal.getNumberOfPages();
+    
+    for (let i = 2; i <= totalPages; i++) {
+        doc.setPage(i);
+        addPageHeader(doc);
+        addPageFooter(doc, i, totalPages);
+    }
+    
+    doc.setPage(1);
+    addPageFooter(doc, 1, totalPages);
+    
+    return doc;
+}`;
+
+            document.getElementById('generatedCode').value = code;
+            document.getElementById('codeOutput').style.display = 'block';
+            
+            // Scroll to code output
+            document.getElementById('codeOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyCode() {
+            const textarea = document.getElementById('generatedCode');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Code copied to clipboard! Now paste it in script.js (replace the generatePDFForYear and generatePDFDocument functions)');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function formatPDFCurrency(amount) {
+            const formatted = amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return 'Rs. ' + formatted;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ganpati Cashbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <!-- Login Form -->
+    <div id="loginContainer" class="container" style="max-width: 700px; margin-top: 40px;">
+        <header class="animate-fade-down">
+            <div class="header-content">
+                <div class="ganpati-image-container">
+                    <img src="logo/logo.jpeg" alt="Shivsrushti Logo" class="ganpati-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🙏</text></svg>';this.classList.add('fallback-icon')">
+                </div>
+                <h1 class="title-gradient">Admin Login</h1>
+                <div class="subtitle-wrapper">
+                    <span class="subtitle-badge">शिवसृष्टी Boyz 🚩</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="form-container animate-fade-up" style="animation-delay: 0.2s;">
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-group floating-label">
+                    <input type="password" id="adminPassword" placeholder=" " required>
+                    <label for="adminPassword">Enter Password</label>
+                    <div class="input-focus-line"></div>
+                </div>
+            </div>
+            <div class="form-actions" style="margin-top: 10px;">
+                <button class="btn btn-primary ripple" onclick="checkAdminLogin()" style="width: 100%;">
+                    <span class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                            <polyline points="11 16 15 12 11 8"/>
+                            <line x1="2" y1="12" x2="15" y2="12"/>
+                        </svg>
+                    </span>
+                    Login
+                </button>
+                <div style="margin-top:12px;">
+                    <a href="index.html" class="btn btn-secondary ripple" style="width:100%;justify-content:center;">
+                <span class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 12l4-4m-4 4l4 4"/>
+                    </svg>
+                </span>
+                Back to Home
+            </a>
+        </div>
+        </div>
+    <div id="loginError" style="color: #ef4444; text-align: center; margin-top: 10px; display: none;">
+        Wrong password! Try again.
+    </div>
+    </div>
+    </div>
+    
+    <!-- Admin Panel (hidden by default) -->
+    <div id="adminPanel" class="container admin-panel-container" style="display: none;">
+        <header class="animate-fade-down">
+            <div class="header-decoration">
+                <div class="decoration-line left"></div>
+                <div class="decoration-line right"></div>
+            </div>
+            <div class="header-content">
+                <div class="ganpati-image-container">
+                    <img src="logo/logo.jpeg" alt="Shivsrushti Logo" class="ganpati-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🙏</text></svg>';this.classList.add('fallback-icon')">
+                </div>
+                <h1 class="title-gradient">Admin Panel</h1>
+                <div class="subtitle-wrapper">
+                    <span class="subtitle-badge">शिवसृष्टी Boyz 🚩</span>
+                </div>
+            </div>
+            <div class="wave-divider">
+                <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
+                    <path d="M0,50 C360,100 720,0 1080,50 C1260,75 1380,60 1440,50 L1440,100 L0,100 Z" fill="var(--bg-primary)"></path>
+                </svg>
+            </div>
+        </header>
+
+        <!-- Quick Login Toggle -->
+        <div class="pdf-upload-section animate-fade-up" style="animation-delay: 0.1s; margin-top: 30px; padding: 15px 25px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <strong style="color:var(--text-primary);font-size:15px;">🔒 Quick Login</strong>
+                    <p style="color:var(--text-muted);font-size:12px;margin:2px 0 0;">ON = login without password | OFF = password required</p>
+                </div>
+                <div class="toggle-visibility" style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;" onclick="toggleQuickLogin(this)">
+                    <span class="toggle-label" style="font-size:13px;color:var(--text-secondary);font-weight:600;">No Password</span>
+                    <div class="toggle-track" id="quickLoginToggle">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Fields Section (moved above Admin Panel selector) -->
+        <div class="pdf-upload-section animate-fade-up" style="animation-delay: 0.15s; margin-top: 30px;">
+            <div class="section-header">
+                <div class="header-line"></div>
+                <h2>Upload Existing PDFs (2022-2025)</h2>
+                <div class="header-line"></div>
+            </div>
+            <div class="upload-container">
+                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="form-group floating-label" style="min-width:200px;">
+                        <input type="number" id="uploadYearInput" placeholder=" " min="2021" max="2050" value="2026">
+                        <label for="uploadYearInput">Enter Year (2021-2050)</label>
+                        <div class="input-focus-line"></div>
+                        <input type="hidden" id="uploadYear" value="">
+                    </div>
+                    <div>
+                        <label style="color: var(--text-secondary); font-size: 12px; display: block; margin-bottom: 5px;">PDF File</label>
+                        <input type="file" id="pdfFileInput" accept=".pdf" style="padding: 8px; border-radius: 10px; background: var(--bg-card); border: 2px dashed var(--glass-border); color: var(--text-primary); cursor: pointer;">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px;">
+                    <div style="flex:1;min-width:180px;">
+                        <label style="color: var(--text-secondary); font-size: 12px; display: block; margin-bottom: 5px;">Organization Name</label>
+                        <input type="text" id="uploadOrgName" placeholder="शिवसृष्टी Boyz" style="width:100%;padding:10px 14px;border-radius:10px;background:var(--bg-card);border:1px solid var(--glass-border);color:var(--text-primary);font-size:14px;font-family:inherit;">
+                    </div>
+                    <div style="flex:1;min-width:180px;">
+                        <label style="color: var(--text-secondary); font-size: 12px; display: block; margin-bottom: 5px;">Marathi Title</label>
+                        <input type="text" id="uploadSubtitle" placeholder="गणेश उत्सव कॅशबुक" style="width:100%;padding:10px 14px;border-radius:10px;background:var(--bg-card);border:1px solid var(--glass-border);color:var(--text-primary);font-size:14px;font-family:inherit;">
+                    </div>
+                    <div style="flex:1;min-width:180px;">
+                        <label style="color: var(--text-secondary); font-size: 12px; display: block; margin-bottom: 5px;">English Tagline</label>
+                        <input type="text" id="uploadTagline" placeholder="Ganpati Festival Cashbook" style="width:100%;padding:10px 14px;border-radius:10px;background:var(--bg-card);border:1px solid var(--glass-border);color:var(--text-primary);font-size:14px;font-family:inherit;">
+                    </div>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary ripple" id="uploadBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Upload
+                    </button>
+                    <button class="btn btn-secondary ripple" onclick="saveUploadCoverSettings()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Save Cover Settings
+                    </button>
+                    <span style="font-size:12px;color:var(--text-secondary);">Fields auto-fill from saved settings. Save Cover to update without uploading.</span>
+                </div>
+                <div id="uploadStatus" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+
+        <div class="year-tabs-container animate-fade-up" style="animation-delay: 0.2s">
+            <div class="section-header">
+                <div class="header-line"></div>
+                <h2>Select Year for Admin Panel</h2>
+                <div class="header-line"></div>
+            </div>
+            <div class="year-tabs" id="yearTabs">
+                <button class="year-tab active" data-year="all" onclick="switchYearTab('all')">All Years</button>
+            </div>
+            <div class="create-year-panel" style="margin-top: 20px;">
+                <div class="form-grid" style="grid-template-columns: 1fr auto auto auto;">
+                    <div class="form-group floating-label">
+                        <input type="number" id="customYearInput" placeholder=" " min="2021" max="2050" value="2026">
+                        <label for="customYearInput">Enter Custom Year (2021-2050)</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <button class="btn btn-primary ripple" id="createPanelBtn" style="height: fit-content; align-self: flex-end;">
+                        <span class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                        </span>
+                        Create Panel
+                    </button>
+                    <button class="btn btn-secondary ripple" id="deletePanelBtn" style="height: fit-content; align-self: flex-end;">
+                        <span class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 6v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </span>
+                        Delete Panel
+                    </button>
+                    <button class="btn btn-clear ripple" id="deleteAllPanelsBtn" style="height: fit-content; align-self: flex-end;">
+                        <span class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </span>
+                        Delete All Panels
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="yearPanels"></div>
+
+        <div class="pdf-upload-section animate-fade-up" style="animation-delay: 0.4s; margin-top: 30px;">
+            <div class="section-header">
+                <div class="header-line"></div>
+                <h2>Uploaded PDFs</h2>
+                <div class="header-line"></div>
+            </div>
+            <div class="pdf-list-container" style="margin-top: 0;">
+                <div id="pdfList" class="pdf-list"></div>
+            </div>
+        </div>
+
+        <div class="fixed-bottom-actions">
+            <a href="index.html" class="btn btn-secondary ripple">
+                <span class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 12l4-4m-4 4l4 4"/>
+                    </svg>
+                </span>
+                Back to Home
+            </a>
+            <button class="btn btn-primary ripple" onclick="openChangePasswordModal()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                <span class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                </span>
+                Change Password
+            </button>
+            <button class="btn btn-primary ripple" onclick="openPDFSettingsModal()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <span class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                </span>
+                PDF Settings
+            </button>
+            <button class="btn btn-primary ripple" onclick="openNotepadModal()" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <span class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                </span>
+                Notepad
+            </button>
+        </div>
+        <footer class="animate-fade-up" style="animation-delay: 0.6s;">
+            <div class="footer-marathi">
+                <div class="footer-marathi-top">
+                    <span class="footer-om-large">ॐ</span>
+                    <span class="footer-mantra">गण गणपतये नमः</span>
+                    <span class="footer-om-large">॥ हर हर महादेव ॥</span>
+                </div>
+                <div class="footer-divider-gold"></div>
+                <div class="footer-marathi-middle">
+                    <p>गणपती बाप्पा मोरया | मंगलमूर्ती मोरया |</p>
+                    <p>शिवसृष्टी Boyz - शिवसृष्टी उत्सव कॅशबुक</p>
+                </div>
+                <div class="footer-divider-gold"></div>
+                <div class="footer-marathi-bottom">
+                    <p class="footer-credit">Developed by <strong>Dhananjay Ranate</strong></p>
+                </div>
+
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function toggleQuickLogin(el) {
+            const track = document.getElementById('quickLoginToggle');
+            const isActive = track.classList.toggle('active');
+            localStorage.setItem('quickAdminLogin', isActive ? 'true' : 'false');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Always show login on page load (no session persistence)
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+
+            // Restore quick login toggle state
+            const ql = document.getElementById('quickLoginToggle');
+            if (localStorage.getItem('quickAdminLogin') === 'true') {
+                ql.classList.add('active');
+            }
+            
+            // Login button handler
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function() {
+                    const password = document.getElementById('adminPassword').value;
+                    const errorDiv = document.getElementById('loginError');
+
+                    // Get stored password from localStorage or use default
+                    const storedPassword = localStorage.getItem('adminPassword') || 'admin123';
+
+                    if (password === storedPassword) {
+                        document.getElementById('loginContainer').style.display = 'none';
+                        document.getElementById('adminPanel').style.display = 'block';
+                        errorDiv.style.display = 'none';
+                    } else {
+                        errorDiv.style.display = 'block';
+                        document.getElementById('adminPassword').value = '';
+                    }
+                });
+            }
+            
+            // Allow Enter key to login
+            const passwordInput = document.getElementById('adminPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        if (loginBtn) loginBtn.click();
+                    }
+                });
+            }
+            
+            // Create Panel button
+            const createBtn = document.getElementById('createPanelBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', function() {
+                    if (window.createCustomYearPanel) window.createCustomYearPanel();
+                    else console.error('createCustomYearPanel not found');
+                });
+            }
+            
+            // Delete Panel button
+            const deleteBtn = document.getElementById('deletePanelBtn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    if (window.deleteCustomYearPanel) window.deleteCustomYearPanel();
+                    else console.error('deleteCustomYearPanel not found');
+                });
+            }
+            
+            // Delete All Panels button
+            const deleteAllBtn = document.getElementById('deleteAllPanelsBtn');
+            if (deleteAllBtn) {
+                deleteAllBtn.addEventListener('click', function() {
+                    if (window.deleteAllPanels) window.deleteAllPanels();
+                    else console.error('deleteAllPanels not found');
+                });
+            }
+            
+            // Year tabs
+            const yearTabs = document.querySelectorAll('.year-tab');
+            yearTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const year = this.getAttribute('data-year');
+                    if (window.switchYearTab) window.switchYearTab(year);
+                    else console.error('switchYearTab not found');
+                });
+            });
+
+            // PDF Upload
+            const uploadBtn = document.getElementById('uploadBtn');
+            if (uploadBtn) {
+                uploadBtn.addEventListener('click', uploadPDF);
+            }
+
+            // Upload year input handler
+            const uploadYearInput = document.getElementById('uploadYearInput');
+            if (uploadYearInput) {
+                uploadYearInput.addEventListener('input', function() {
+                    let val = this.value.trim();
+                    if (val && !isNaN(val) && val.length === 4) {
+                        document.getElementById('uploadYear').value = val;
+                        const s = getPDFSettingsForYear(val);
+                        document.getElementById('uploadOrgName').value = s.orgName;
+                        document.getElementById('uploadSubtitle').value = s.subtitle;
+                        document.getElementById('uploadTagline').value = s.tagline;
+                    }
+                });
+            }
+
+            loadUploadedPDFs();
+        });
+
+        async function uploadPDF() {
+            const year = document.getElementById('uploadYear').value;
+            const fileInput = document.getElementById('pdfFileInput');
+            const status = document.getElementById('uploadStatus');
+
+            if (!year) {
+                status.innerHTML = '<p style="color: #ef4444;">Please select a year!</p>';
+                return;
+            }
+            if (!fileInput.files || fileInput.files.length === 0) {
+                status.innerHTML = '<p style="color: #ef4444;">Please select a PDF file!</p>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                status.innerHTML = '<p style="color: #ef4444;">Only PDF files allowed!</p>';
+                return;
+            }
+
+            status.innerHTML = '<p style="color: #3b82f6;">Uploading ' + file.name + '...</p>';
+
+            const formData = new FormData();
+            formData.append('pdf', file);
+            formData.append('year', year);
+            const orgName = document.getElementById('uploadOrgName').value.trim();
+            const subtitle = document.getElementById('uploadSubtitle').value.trim();
+            const tagline = document.getElementById('uploadTagline').value.trim();
+            formData.append('orgName', orgName);
+            formData.append('subtitle', subtitle);
+            formData.append('tagline', tagline);
+
+            try {
+                const response = await fetch('/api/upload-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Server returned: ' + text.substring(0, 100));
+                }
+
+                if (result.success) {
+                    status.innerHTML = '<p style="color: #22c55e;">PDF uploaded successfully with cover settings!</p>';
+                    fileInput.value = '';
+                    document.getElementById('uploadYear').value = '';
+                    document.getElementById('uploadOrgName').value = '';
+                    document.getElementById('uploadSubtitle').value = '';
+                    document.getElementById('uploadTagline').value = '';
+                    document.getElementById('uploadYearInput').value = '2026';
+                    loadUploadedPDFs();
+                } else {
+                    status.innerHTML = '<p style="color: #ef4444;">Error: ' + result.error + '</p>';
+                }
+            } catch (error) {
+                status.innerHTML = '<p style="color: #ef4444;">Upload failed: ' + error.message + '</p>';
+            }
+        }
+
+        window.saveUploadCoverSettings = function saveUploadCoverSettings() {
+            const year = document.getElementById('uploadYear').value;
+            const status = document.getElementById('uploadStatus');
+            if (!year) {
+                status.innerHTML = '<p style="color: #ef4444;">Please select a year first!</p>';
+                return;
+            }
+            const orgName = document.getElementById('uploadOrgName').value.trim();
+            const subtitle = document.getElementById('uploadSubtitle').value.trim();
+            const tagline = document.getElementById('uploadTagline').value.trim();
+            if (!orgName || !subtitle || !tagline) {
+                status.innerHTML = '<p style="color: #ef4444;">All three fields are required!</p>';
+                return;
+            }
+            window.savePDFSettings(year, { orgName, subtitle, tagline });
+            status.innerHTML = '<p style="color: #22c55e;">Cover settings saved for ' + year + '! View any ' + year + ' PDF to see changes.</p>';
+        }
+
+        async function loadUploadedPDFs() {
+            const pdfList = document.getElementById('pdfList');
+            if (!pdfList) return;
+
+            try {
+                const response = await fetch('/api/uploaded-pdfs');
+                const result = await response.json();
+
+                if (result.success && result.data.length > 0) {
+                    pdfList.innerHTML = result.data.map(pdf => {
+                        const escName = pdf.displayName.replace(/'/g, "\\'");
+                        const escSub = (pdf.subtitle || '').replace(/'/g, "\\'");
+                        const escTag = (pdf.tagline || '').replace(/'/g, "\\'");
+                        const escOrg = (pdf.orgName || '').replace(/'/g, "\\'");
+                        const subDisplay = pdf.subtitle ? `<div style="font-size: 10px; color: #ff8c00;">Marathi: ${pdf.subtitle}</div>` : '';
+                        const tagDisplay = pdf.tagline ? `<div style="font-size: 10px; color: #aaa;">Tagline: ${pdf.tagline}</div>` : '';
+                        return `
+                        <div class="pdf-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; margin-bottom: 10px; background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color);">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span style="font-size: 24px;">📄</span>
+                                <div>
+                    <strong style="color: var(--text-primary);">${pdf.displayName}</strong>
+                    <div style="font-size: 11px; color: #888;">Year: ${pdf.year} | Uploaded: ${pdf.uploadedAt}</div>
+                    ${subDisplay}
+                    ${tagDisplay}
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary ripple" onclick="viewMergedPDF('${pdf.filename}', '${pdf.year}', '${escSub}', '${escTag}', '${escOrg}')" style="padding: 8px 16px; font-size: 13px;">
+                    View PDF
+                </button>
+                <button class="btn btn-secondary ripple" onclick="downloadMergedPDF('${pdf.filename}', '${pdf.year}', '${escSub}', '${escTag}', '${escOrg}')" style="padding: 8px 16px; font-size: 13px;">
+                    Download
+                </button>
+                <button class="btn btn-secondary ripple" onclick="editPdfCover('${pdf.filename}', '${escName}', '${escSub}', '${escTag}', '${escOrg}')" style="padding: 8px 12px; font-size: 13px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    Cover
+                </button>
+                <button class="btn btn-secondary ripple" onclick="renamePDF('${pdf.filename}', '${escName}')" style="padding: 8px 12px; font-size: 13px;">
+                    Rename
+                </button>
+                <button class="btn btn-delete ripple" onclick="deletePDF('${pdf.filename}')" style="padding: 8px 12px; font-size: 13px;">
+                    Delete
+                </button>
+            </div>
+        </div>`;
+                    }).join('');
+                } else {
+                    pdfList.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">No PDFs uploaded yet. Upload your existing PDFs above.</p>';
+                }
+            } catch (error) {
+                pdfList.innerHTML = `<p style="color: #ef4444;">Error loading PDFs: ${error.message}</p>`;
+            }
+        }
+
+        function getPDFSettingsForYear(year) {
+            const defaults = { orgName: 'शिवसृष्टी Boyz', subtitle: 'गणेश उत्सव कॅशबुक', tagline: 'Ganpati Festival Cashbook' };
+            try {
+                const key = 'pdfCustomSettings_' + year;
+                const stored = JSON.parse(localStorage.getItem(key) || '{}');
+                if (Object.keys(stored).length > 0) return { ...defaults, ...stored };
+                const global = JSON.parse(localStorage.getItem('pdfCustomSettings') || '{}');
+                if (Object.keys(global).length > 0) return { ...defaults, ...global };
+                return defaults;
+            } catch (e) { return defaults; }
+        }
+
+        function createCoverHTML(year, logoSrc, pdfSubtitle, pdfTagline, pdfOrgName) {
+            const fallback = getPDFSettingsForYear(year);
+            const s = {
+                orgName: pdfOrgName || fallback.orgName,
+                subtitle: pdfSubtitle || fallback.subtitle,
+                tagline: pdfTagline || fallback.tagline
+            };
+            return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@page{margin:0;size:A4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Poppins","Noto Sans Devanagari",sans-serif;background:#f5f0eb;color:#1a1a2e;font-size:10px;line-height:1.4;}
+.cover-page{width:210mm;height:297mm;background:linear-gradient(160deg,#1a0800 0%,#3d1508 25%,#5a2010 50%,#3d1508 75%,#1a0800 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cover-page::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,140,0,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(255,215,0,0.1) 0%,transparent 50%);pointer-events:none;}
+.cover-outer-border{position:absolute;top:8mm;left:8mm;right:8mm;bottom:8mm;border:5px solid #ff8c00;border-radius:25px;box-shadow:0 0 30px rgba(255,140,0,0.3),inset 0 0 30px rgba(255,140,0,0.1);}
+.cover-inner-border{position:absolute;top:11mm;left:11mm;right:11mm;bottom:11mm;border:3px solid rgba(255,215,0,0.4);border-radius:20px;}
+.cover-corner{position:absolute;width:60px;height:60px;border:5px solid #ffd700;}
+.cover-corner.tl{top:14mm;left:14mm;border-right:none;border-bottom:none;border-radius:15px 0 0 0;}
+.cover-corner.tr{top:14mm;right:14mm;border-left:none;border-bottom:none;border-radius:0 15px 0 0;}
+.cover-corner.bl{bottom:14mm;left:14mm;border-right:none;border-top:none;border-radius:0 0 0 15px;}
+.cover-corner.br{bottom:14mm;right:14mm;border-left:none;border-top:none;border-radius:0 0 15px 0;}
+.cover-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding:30px;margin-top:-40px;}
+.cover-om-top{font-size:32px;color:#ffd700;margin-bottom:35px;text-shadow:0 0 40px rgba(255,215,0,0.8),0 0 80px rgba(255,215,0,0.4);font-weight:bold;}
+.cover-logo-wrap{width:280px;height:280px;position:relative;margin-bottom:25px;}
+.cover-logo-glow{position:absolute;top:-30px;left:-30px;right:-30px;bottom:-30px;background:radial-gradient(circle,rgba(255,140,0,0.7) 0%,rgba(255,140,0,0.3) 40%,transparent 70%);border-radius:50%;}
+.cover-logo-ring{position:absolute;top:-15px;left:-15px;right:-15px;bottom:-15px;border:6px solid rgba(255,215,0,0.7);border-radius:50%;}
+.cover-logo-ring2{position:absolute;top:-25px;left:-25px;right:-25px;bottom:-25px;border:4px solid rgba(255,215,0,0.3);border-radius:50%;}
+.cover-logo{width:100%;height:100%;object-fit:contain;border-radius:50%;border:8px solid #ffd700;background:rgba(255,255,255,0.98);padding:12px;box-shadow:0 0 100px rgba(255,140,0,1),0 0 200px rgba(255,140,0,0.4),0 20px 60px rgba(0,0,0,0.8);position:relative;z-index:2;}
+.cover-mandal-name{font-size:36px;font-weight:900;color:#ffd700;text-align:center;letter-spacing:2px;text-shadow:0 0 30px rgba(255,215,0,0.6),0 3px 10px rgba(0,0,0,0.7);line-height:1.4;border-left:6px solid #dc2626;border-right:6px solid #dc2626;padding:10px 35px;margin-top:10px;}
+.cover-divider{width:280px;height:4px;background:linear-gradient(90deg,transparent,#ffd700,#ff8c00,#ffd700,transparent);margin:18px auto;border-radius:3px;box-shadow:0 0 15px rgba(255,215,0,0.4);}
+.cover-subtitle{font-size:24px;font-weight:700;color:#ff8c00;text-align:center;letter-spacing:4px;margin-bottom:8px;text-shadow:0 0 20px rgba(255,140,0,0.5);}
+.cover-tagline{font-size:15px;color:#d4b896;text-align:center;letter-spacing:1.5px;font-weight:500;}
+.cover-year-box{margin-top:30px;padding:15px 50px;border:3px solid #ffd700;border-radius:35px;background:linear-gradient(135deg,rgba(255,140,0,0.15),rgba(255,215,0,0.1));text-align:center;box-shadow:0 0 30px rgba(255,215,0,0.2);}
+.cover-year-label{font-size:14px;color:#d4b896;display:block;margin-bottom:5px;letter-spacing:1px;}
+.cover-year-val{font-size:30px;font-weight:800;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,0.5);}
+.cover-footer{position:absolute;bottom:15mm;left:0;right:0;text-align:center;z-index:10;}
+.cover-footer-om{font-size:20px;color:#ffd700;margin-bottom:8px;letter-spacing:3px;}
+.cover-footer p{font-size:10px;color:#8b7355;letter-spacing:1.5px;line-height:1.6;}
+</style></head><body>
+<div class="cover-page">
+  <div class="cover-outer-border"></div>
+  <div class="cover-inner-border"></div>
+  <div class="cover-corner tl"></div><div class="cover-corner tr"></div><div class="cover-corner bl"></div><div class="cover-corner br"></div>
+  <div class="cover-content">
+    <div class="cover-om-top">|| \u0939\u0930 \u0939\u0930 \u092E\u0939\u093E\u0926\u0947\u0935 \ud83d\udd31 ||</div>
+    <div class="cover-logo-wrap"><div class="cover-logo-glow"></div><div class="cover-logo-ring"></div><div class="cover-logo-ring2"></div><img src="${logoSrc}" alt="Logo" class="cover-logo" onerror="this.style.display='none'"></div>
+    <div class="cover-mandal-name">${s.orgName}</div>
+    <div class="cover-divider"></div>
+    <div class="cover-subtitle">${s.subtitle}</div>
+    <div class="cover-tagline">${s.tagline}</div>
+    <div class="cover-year-box"><span class="cover-year-label">\u0935\u0930\u094D\u0937 / Year</span><span class="cover-year-val">${year}</span></div>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-footer-om">\u0950 \u0917\u0923 \u0917\u0923\u092A\u0924\u092F\u0947 \u0928\u092E\u0903</div>
+    <p>Developed by | Dhananjay Ranate</p>
+  </div>
+</div>
+</body></html>`;
+        }
+
+        async function generateClientMergedPDF(filename, year, download, pdfSubtitle, pdfTagline, pdfOrgName) {
+            try {
+                const logoDataURL = await window.loadLogo();
+                const coverHTML = createCoverHTML(year, logoDataURL, pdfSubtitle, pdfTagline, pdfOrgName);
+                const iframe = document.createElement('iframe');
+                iframe.style.position = 'absolute';
+                iframe.style.left = '-9999px';
+                iframe.style.top = '-9999px';
+                iframe.style.width = '210mm';
+                iframe.style.height = '297mm';
+                iframe.style.border = 'none';
+                document.body.appendChild(iframe);
+                iframe.contentDocument.write(coverHTML);
+                iframe.contentDocument.close();
+                const imgs = iframe.contentDocument.querySelectorAll('img');
+                await Promise.all([...imgs].map(img => new Promise(r => {
+                    if (img.complete) r(); else { img.onload = r; img.onerror = r; setTimeout(r, 2000); }
+                })));
+                try { await iframe.contentDocument.fonts.ready; } catch(e) {}
+                await new Promise(r => setTimeout(r, 500));
+                const canvas = await html2canvas(iframe.contentDocument.body, {
+                    scale: 2, useCORS: true, backgroundColor: '#ffffff', allowTaint: true
+                });
+                document.body.removeChild(iframe);
+                const { jsPDF } = window.jspdf;
+                const coverDoc = new jsPDF('p', 'mm', 'a4');
+                const pgW = coverDoc.internal.pageSize.getWidth();
+                const imgH = (canvas.height * pgW) / canvas.width;
+                coverDoc.addImage(canvas, 'PNG', 0, 0, pgW, imgH);
+                const coverBytes = coverDoc.output('arraybuffer');
+                const resp = await fetch('/uploads/' + filename);
+                const uploadBytes = await resp.arrayBuffer();
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+                const coverPdf = await PDFDocument.load(coverBytes);
+                const cPgs = await mergedPdf.copyPages(coverPdf, coverPdf.getPageIndices());
+                cPgs.forEach(p => mergedPdf.addPage(p));
+                const existingPdf = await PDFDocument.load(uploadBytes);
+                const indices = existingPdf.getPageIndices();
+                const uPgs = await mergedPdf.copyPages(existingPdf, indices);
+                uPgs.forEach(p => mergedPdf.addPage(p));
+                const mergedBytes = await mergedPdf.save();
+                const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                if (download) {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'Ganpati_Cashbook_Shivsrushti_' + year + '.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(url), 10000);
+                } else {
+                    window.open(url, '_blank');
+                }
+            } catch (error) {
+                console.error('PDF merge error:', error);
+                alert('Error generating PDF. Make sure server is running!');
+            }
+        }
+
+        async function viewMergedPDF(filename, year, subtitle, tagline, orgName) {
+            await generateClientMergedPDF(filename, year, false, subtitle, tagline, orgName);
+        }
+
+        async function downloadMergedPDF(filename, year, subtitle, tagline, orgName) {
+            await generateClientMergedPDF(filename, year, true, subtitle, tagline, orgName);
+        }
+
+        async function renamePDF(filename, currentName) {
+            const newName = prompt('Enter new display name:', currentName);
+            if (!newName || !newName.trim() || newName === currentName) return;
+            try {
+                const response = await fetch(`/api/uploaded-pdfs/${filename}/rename`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ displayName: newName.trim() })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    loadUploadedPDFs();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function deletePDF(filename) {
+            if (!confirm(`Delete ${filename}?`)) return;
+            try {
+                const response = await fetch(`/api/uploaded-pdfs/${filename}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) {
+                    loadUploadedPDFs();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Per-PDF cover settings editor
+        let editCoverFilename = '';
+        function editPdfCover(filename, displayName, subtitle, tagline, orgName) {
+            editCoverFilename = filename;
+            document.getElementById('editCoverFilename').textContent = displayName || filename;
+            document.getElementById('editCoverOrgName').value = orgName || '';
+            document.getElementById('editCoverSubtitle').value = subtitle || '';
+            document.getElementById('editCoverTagline').value = tagline || '';
+            document.getElementById('editCoverStatus').style.display = 'none';
+            document.getElementById('editCoverModal').style.display = 'flex';
+        }
+        function closeEditCoverModal() {
+            document.getElementById('editCoverModal').style.display = 'none';
+        }
+        async function saveEditCover() {
+            const orgName = document.getElementById('editCoverOrgName').value.trim();
+            const subtitle = document.getElementById('editCoverSubtitle').value.trim();
+            const tagline = document.getElementById('editCoverTagline').value.trim();
+            const status = document.getElementById('editCoverStatus');
+            if (!orgName || !subtitle || !tagline) {
+                status.style.color = '#ef4444';
+                status.textContent = 'All three fields required!';
+                status.style.display = 'block';
+                return;
+            }
+            try {
+                const response = await fetch(`/api/uploaded-pdfs/${editCoverFilename}/cover`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orgName, subtitle, tagline })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    status.style.color = '#22c55e';
+                    status.textContent = 'Cover settings saved!';
+                    status.style.display = 'block';
+                    setTimeout(() => { closeEditCoverModal(); loadUploadedPDFs(); }, 1000);
+                } else {
+                    status.style.color = '#ef4444';
+                    status.textContent = 'Error: ' + result.error;
+                    status.style.display = 'block';
+                }
+            } catch (error) {
+                status.style.color = '#ef4444';
+                status.textContent = 'Error: ' + error.message;
+                status.style.display = 'block';
+            }
+        }
+    </script>
+    <div id="editModal" class="edit-modal-overlay">
+        <div class="edit-modal">
+            <div class="edit-modal-header">
+                <h3>Edit Entry</h3>
+                <button class="edit-modal-close" onclick="closeEditModal()">✕</button>
+            </div>
+            <form id="editForm">
+                <div class="edit-form-grid">
+                    <div class="form-group floating-label">
+                        <input type="text" id="editName" placeholder=" " required>
+                        <label for="editName">Remark (Name / Purpose)</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="date" id="editDate" required>
+                        <label for="editDate">Date</label>
+                    </div>
+                    <div class="form-group floating-label select-group">
+                        <select id="editMode" required>
+                            <option value="">Select Mode</option>
+                            <option value="Online">Online</option>
+                            <option value="Cash">Cash</option>
+                        </select>
+                        <label for="editMode">Mode</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="number" id="editCashIn" placeholder=" " min="0" step="0.01">
+                        <label for="editCashIn">Cash In (+)</label>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="number" id="editCashOut" placeholder=" " min="0" step="0.01">
+                        <label for="editCashOut">Cash Out (-)</label>
+                    </div>
+                </div>
+                <div class="edit-modal-actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="edit-modal-overlay">
+        <div class="edit-modal">
+            <div class="edit-modal-header">
+                <h3>Change Admin Password</h3>
+                <button class="edit-modal-close" onclick="closeChangePasswordModal()">✕</button>
+            </div>
+            <form id="changePasswordForm" onsubmit="changePassword(event)">
+                <div class="edit-form-grid">
+                    <div class="form-group floating-label">
+                        <input type="password" id="currentPassword" placeholder=" " required>
+                        <label for="currentPassword">Current Password</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="password" id="newPassword" placeholder=" " required minlength="6">
+                        <label for="newPassword">New Password (min 6 chars)</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="password" id="confirmPassword" placeholder=" " required minlength="6">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                </div>
+                <div id="passwordChangeError" style="color: #ef4444; text-align: center; margin-top: 10px; display: none;"></div>
+                <div id="passwordChangeSuccess" style="color: #22c55e; text-align: center; margin-top: 10px; display: none;"></div>
+                <div class="edit-modal-actions">
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeChangePasswordModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notepad Modal -->
+    <div id="notepadModal" class="edit-modal-overlay">
+        <div class="edit-modal" style="max-width: 750px;">
+            <div class="edit-modal-header">
+                <h3>Notepad</h3>
+                <button class="edit-modal-close" onclick="closeNotepadModal()">✕</button>
+            </div>
+            <div style="padding: 10px 15px 5px;">
+                <div id="notepadTabs" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;"></div>
+            </div>
+            <div style="padding: 0 15px 15px;">
+                <div style="display:flex;gap:10px;margin-bottom:8px;align-items:center;">
+                    <input type="text" id="notepadTitle" placeholder="Note title..." style="flex:1;padding:10px 14px;border-radius:8px;background:var(--bg-card);border:1px solid var(--glass-border);color:var(--text-primary);font-size:14px;font-family:'Poppins','Noto Sans Devanagari',sans-serif;outline:none;">
+                    <span style="font-size:12px;color:var(--text-secondary);">Title</span>
+                </div>
+                <textarea id="notepadContent" style="width:100%;min-height:320px;padding:12px;border-radius:10px;background:var(--bg-card);border:1px solid var(--glass-border);color:var(--text-primary);font-size:14px;font-family:'Poppins','Noto Sans Devanagari',sans-serif;resize:vertical;line-height:1.6;" placeholder="Write your notes here... Auto-saves every 2 seconds."></textarea>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+                    <span id="notepadSaveStatus" style="font-size:12px;color:var(--text-secondary);">Auto-save enabled</span>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-primary ripple" onclick="viewNotepadPDF()" style="background: linear-gradient(135deg, #3b82f6, #2563eb);padding:7px 14px;font-size:13px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            View PDF
+                        </button>
+                        <button class="btn btn-primary ripple" onclick="downloadNotepadPDF()" style="padding:7px 14px;font-size:13px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Settings Modal -->
+    <div id="pdfSettingsModal" class="edit-modal-overlay">
+        <div class="edit-modal">
+            <div class="edit-modal-header">
+                <h3>PDF Cover Page Settings</h3>
+                <button class="edit-modal-close" onclick="closePDFSettingsModal()">✕</button>
+            </div>
+            <div>
+                <div class="edit-form-grid">
+                    <div class="form-group floating-label select-group">
+                        <select id="pdfSettingsYear" style="padding:10px;border-radius:10px;background:var(--bg-card);border:1px solid var(--glass-border);color:var(--text-primary);font-size:14px;">
+                            <option value="">Select Year</option>
+                        </select>
+                        <label for="pdfSettingsYear">Year</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="pdfOrgName" placeholder=" " value="">
+                        <label for="pdfOrgName">Organization Name</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="pdfSubtitle" placeholder=" " value="">
+                        <label for="pdfSubtitle">Marathi Title</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="pdfTagline" placeholder=" " value="">
+                        <label for="pdfTagline">English Tagline</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; padding: 10px; border-top: 1px solid var(--glass-border);">
+                    <p style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">2nd Page Header (inner pages)</p>
+                    <div class="edit-form-grid">
+                        <div class="form-group floating-label">
+                            <input type="text" id="pdfHeaderOrgName" placeholder=" " value="">
+                            <label for="pdfHeaderOrgName">Header Organization Name</label>
+                            <div class="input-focus-line"></div>
+                        </div>
+                        <div class="form-group floating-label">
+                            <input type="text" id="pdfHeaderSubtitle" placeholder=" " value="">
+                            <label for="pdfHeaderSubtitle">Header Subtitle</label>
+                            <div class="input-focus-line"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="pdfSettingsStatus" style="text-align: center; margin-top: 10px; font-size: 14px; display: none;"></div>
+                <div class="edit-modal-actions">
+                    <button class="btn btn-primary" onclick="onSavePDFSettings()">Save Settings</button>
+                    <button class="btn btn-secondary" onclick="closePDFSettingsModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Cover Modal (per-PDF) -->
+    <div id="editCoverModal" class="edit-modal-overlay">
+        <div class="edit-modal">
+            <div class="edit-modal-header">
+                <h3>Edit PDF Cover Settings</h3>
+                <button class="edit-modal-close" onclick="closeEditCoverModal()">✕</button>
+            </div>
+            <div style="padding: 5px 15px 0;">
+                <p style="font-size: 13px; color: var(--text-secondary);">Editing cover for: <strong id="editCoverFilename" style="color: var(--text-primary);"></strong></p>
+            </div>
+            <div>
+                <div class="edit-form-grid">
+                    <div class="form-group floating-label">
+                        <input type="text" id="editCoverOrgName" placeholder=" " value="">
+                        <label for="editCoverOrgName">Organization Name</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="editCoverSubtitle" placeholder=" " value="">
+                        <label for="editCoverSubtitle">Marathi Title</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="text" id="editCoverTagline" placeholder=" " value="">
+                        <label for="editCoverTagline">English Tagline</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                </div>
+                <div id="editCoverStatus" style="text-align: center; margin-top: 10px; font-size: 14px; display: none;"></div>
+                <div class="edit-modal-actions">
+                    <button class="btn btn-primary" onclick="saveEditCover()">Save</button>
+                    <button class="btn btn-secondary" onclick="closeEditCoverModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function populatePDFSettingsYear() {
+            const sel = document.getElementById('pdfSettingsYear');
+            const tabs = document.querySelectorAll('.year-tab[data-year]');
+            const years = [];
+            tabs.forEach(t => { const y = t.getAttribute('data-year'); if (y !== 'all') years.push(y); });
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select Year</option>' + years.map(y => '<option value="' + y + '">' + y + '</option>').join('');
+            if (current && years.includes(current)) sel.value = current;
+            else if (years.length > 0) sel.value = years[0];
+            sel.onchange = loadPDFSettingsForYear;
+        }
+        function loadPDFSettingsForYear() {
+            const year = document.getElementById('pdfSettingsYear').value;
+            if (!year) return;
+            const s = getPDFSettings(year);
+            document.getElementById('pdfOrgName').value = s.orgName;
+            document.getElementById('pdfSubtitle').value = s.subtitle;
+            document.getElementById('pdfTagline').value = s.tagline;
+            document.getElementById('pdfHeaderOrgName').value = s.headerOrgName || '';
+            document.getElementById('pdfHeaderSubtitle').value = s.headerSubtitle || '';
+        }
+        function openPDFSettingsModal() {
+            populatePDFSettingsYear();
+            const year = document.getElementById('pdfSettingsYear').value;
+            if (year) loadPDFSettingsForYear();
+            document.getElementById('pdfSettingsStatus').style.display = 'none';
+            document.getElementById('pdfSettingsModal').style.display = 'flex';
+        }
+        function closePDFSettingsModal() {
+            document.getElementById('pdfSettingsModal').style.display = 'none';
+        }
+        function onSavePDFSettings() {
+            const year = document.getElementById('pdfSettingsYear').value;
+            if (!year) {
+                const status = document.getElementById('pdfSettingsStatus');
+                status.style.color = '#ef4444';
+                status.textContent = 'Please select a year!';
+                status.style.display = 'block';
+                return;
+            }
+            const orgName = document.getElementById('pdfOrgName').value.trim();
+            const subtitle = document.getElementById('pdfSubtitle').value.trim();
+            const tagline = document.getElementById('pdfTagline').value.trim();
+            const headerOrgName = document.getElementById('pdfHeaderOrgName').value.trim();
+            const headerSubtitle = document.getElementById('pdfHeaderSubtitle').value.trim();
+            if (!orgName || !subtitle || !tagline) {
+                const status = document.getElementById('pdfSettingsStatus');
+                status.style.color = '#ef4444';
+                status.textContent = 'Cover fields (Org Name, Marathi Title, Tagline) are required!';
+                status.style.display = 'block';
+                return;
+            }
+            window.savePDFSettings(year, { orgName, subtitle, tagline, headerOrgName, headerSubtitle });
+            const status = document.getElementById('pdfSettingsStatus');
+            status.style.color = '#22c55e';
+            status.textContent = 'Settings saved for ' + year + '!';
+            status.style.display = 'block';
+            setTimeout(closePDFSettingsModal, 1200);
+        }
+
+        // ===== Multi-note Notepad =====
+        let notepadNotes = [];
+        let notepadActiveId = null;
+        let notepadNextId = 1;
+        let notepadAutoSaveTimer = null;
+
+        function getNotepadNotes() {
+            try { return JSON.parse(localStorage.getItem('adminNotepadNotes') || '[]'); } catch (e) { return []; }
+        }
+        function saveNotepadNotes() {
+            localStorage.setItem('adminNotepadNotes', JSON.stringify(notepadNotes));
+        }
+        function renderNotepadTabs() {
+            const container = document.getElementById('notepadTabs');
+            container.innerHTML = '';
+            notepadNotes.forEach(n => {
+                const wrapper = document.createElement('span');
+                wrapper.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:5px 8px 5px 14px;border-radius:8px;border:2px solid var(--glass-border);background:' + (n.id === notepadActiveId ? 'var(--primary-gradient-start)' : 'var(--bg-card)') + ';color:' + (n.id === notepadActiveId ? '#fff' : 'var(--text-primary)') + ';font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;';
+                wrapper.onclick = () => switchNotepadNote(n.id);
+                const label = document.createElement('span');
+                label.textContent = n.title;
+                wrapper.appendChild(label);
+                const delBtn = document.createElement('button');
+                delBtn.innerHTML = '✕';
+                delBtn.title = 'Delete this note';
+                delBtn.style.cssText = 'background:rgba(239,68,68,0.2);border:none;border-radius:4px;color:' + (n.id === notepadActiveId ? '#fff' : '#ef4444') + ';font-size:14px;font-weight:700;cursor:pointer;line-height:1;padding:3px 6px;opacity:0.85;transition:all 0.2s;margin-left:2px;';
+                delBtn.onmouseover = () => delBtn.style.opacity = '1';
+                delBtn.onmouseout = () => delBtn.style.opacity = '0.85';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteNotepadNote(n.id); };
+                wrapper.appendChild(delBtn);
+                container.appendChild(wrapper);
+            });
+            const addBtn = document.createElement('button');
+            addBtn.innerHTML = '+';
+            addBtn.title = 'Add new note';
+            addBtn.style.cssText = 'padding:5px 14px;border-radius:8px;border:2px dashed var(--glass-border);background:var(--bg-card);color:var(--text-primary);font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;line-height:1;';
+            addBtn.onclick = addNotepadNote;
+            container.appendChild(addBtn);
+        }
+        function switchNotepadNote(id) {
+            const textarea = document.getElementById('notepadContent');
+            const titleInput = document.getElementById('notepadTitle');
+            const note = notepadNotes.find(n => n.id === notepadActiveId);
+            if (note) {
+                note.content = textarea.value;
+                note.title = titleInput.value.trim() || note.title;
+            }
+            notepadActiveId = id;
+            const active = notepadNotes.find(n => n.id === id);
+            textarea.value = active ? active.content : '';
+            titleInput.value = active ? active.title : '';
+            document.getElementById('notepadSaveStatus').textContent = 'Auto-save enabled';
+            renderNotepadTabs();
+        }
+        function addNotepadNote() {
+            const title = prompt('Enter note title:', '');
+            if (!title || !title.trim()) return;
+            const id = notepadNextId++;
+            const newNote = { id, title: title.trim(), content: '' };
+            notepadNotes.push(newNote);
+            saveNotepadNotes();
+            switchNotepadNote(newNote.id);
+        }
+        function deleteNotepadNote(id) {
+            if (!confirm('Delete this note?')) return;
+            const idx = notepadNotes.findIndex(n => n.id === id);
+            if (idx === -1) return;
+            notepadNotes.splice(idx, 1);
+            if (notepadNotes.length === 0) {
+                const newId = notepadNextId++;
+                notepadNotes.push({ id: newId, title: 'Note ' + newId, content: '' });
+            }
+            if (notepadActiveId === id) {
+                notepadActiveId = notepadNotes[0].id;
+            }
+            saveNotepadNotes();
+            const textarea = document.getElementById('notepadContent');
+            const active = notepadNotes.find(n => n.id === notepadActiveId);
+            textarea.value = active ? active.content : '';
+            renderNotepadTabs();
+        }
+        function openNotepadModal() {
+            notepadNotes = getNotepadNotes();
+            if (notepadNotes.length === 0) {
+                notepadNextId = 1;
+                const title = prompt('Enter note title:', '');
+                const firstTitle = (title && title.trim()) ? title.trim() : 'Note 1';
+                notepadNotes = [{ id: notepadNextId++, title: firstTitle, content: '' }];
+                saveNotepadNotes();
+            }
+            notepadActiveId = notepadNotes[0].id;
+            document.getElementById('notepadContent').value = notepadNotes[0].content;
+            document.getElementById('notepadTitle').value = notepadNotes[0].title;
+            document.getElementById('notepadModal').style.display = 'flex';
+            document.getElementById('notepadSaveStatus').textContent = 'Auto-save enabled';
+            renderNotepadTabs();
+
+            const textarea = document.getElementById('notepadContent');
+            const titleInput = document.getElementById('notepadTitle');
+            function saveCurrentNote() {
+                const n = notepadNotes.find(x => x.id === notepadActiveId);
+                if (n) {
+                    n.content = textarea.value;
+                    n.title = titleInput.value.trim() || n.title;
+                }
+                saveNotepadNotes();
+            }
+            textarea.oninput = function() {
+                document.getElementById('notepadSaveStatus').textContent = 'Unsaved changes...';
+                if (notepadAutoSaveTimer) clearTimeout(notepadAutoSaveTimer);
+                notepadAutoSaveTimer = setTimeout(() => {
+                    saveCurrentNote();
+                    renderNotepadTabs();
+                    document.getElementById('notepadSaveStatus').textContent = 'Auto-saved at ' + new Date().toLocaleTimeString();
+                }, 2000);
+            };
+            titleInput.oninput = function() {
+                saveCurrentNote();
+                renderNotepadTabs();
+                document.getElementById('notepadSaveStatus').textContent = 'Title saved';
+            };
+        }
+        function closeNotepadModal() {
+            const textarea = document.getElementById('notepadContent');
+            const note = notepadNotes.find(n => n.id === notepadActiveId);
+            if (note) note.content = textarea.value;
+            saveNotepadNotes();
+            if (notepadAutoSaveTimer) clearTimeout(notepadAutoSaveTimer);
+            document.getElementById('notepadModal').style.display = 'none';
+        }
+
+        async function generateNotepadPDFBlob() {
+            const notes = getNotepadNotes().filter(n => n.content.trim());
+            if (notes.length === 0) return null;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const mg = 15;
+            const pw = doc.internal.pageSize.getWidth() - mg * 2;
+            const pageH = doc.internal.pageSize.getHeight();
+
+            for (let ni = 0; ni < notes.length; ni++) {
+                if (ni > 0) doc.addPage();
+                // Header
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text('ShivSrushti Boyz Notepad', pw / 2 + mg, 18, { align: 'center' });
+                // Note title
+                doc.setFontSize(13);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(200, 150, 50);
+                doc.text(notes[ni].title, mg, 30);
+                doc.setTextColor(0);
+                // Divider
+                doc.setDrawColor(200, 150, 50);
+                doc.line(mg, 34, mg + pw, 34);
+                // Content
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'normal');
+                const lines = doc.splitTextToSize(notes[ni].content, pw);
+                let y = 42;
+                for (let i = 0; i < lines.length; i++) {
+                    if (y > pageH - 20) {
+                        doc.addPage();
+                        y = 15;
+                    }
+                    doc.text(lines[i], mg, y);
+                    y += 6;
+                }
+            }
+            // Footer on all pages
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= totalPages; p++) {
+                doc.setPage(p);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(150);
+                doc.text('ShivSrushti Boyz Notepad | ' + new Date().toLocaleDateString('en-IN'), mg, pageH - 8);
+                doc.text('Page ' + p + ' of ' + totalPages, pw / 2 + mg, pageH - 8, { align: 'center' });
+                doc.setTextColor(0);
+            }
+            return doc.output('arraybuffer');
+        }
+        async function downloadNotepadPDF() {
+            const bytes = await generateNotepadPDFBlob();
+            if (!bytes) { alert('All notes are empty! Write something first.'); return; }
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ShivSrushti_Boyz_Notepad.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }
+        async function viewNotepadPDF() {
+            const bytes = await generateNotepadPDFBlob();
+            if (!bytes) { alert('All notes are empty! Write something first.'); return; }
+            const blob = new Blob([bytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+
+        // Close modals on overlay click
+        document.addEventListener('click', function(e) {
+            const pm = document.getElementById('pdfSettingsModal');
+            if (e.target === pm) closePDFSettingsModal();
+            const nm = document.getElementById('notepadModal');
+            if (e.target === nm) closeNotepadModal();
+            const cm = document.getElementById('editCoverModal');
+            if (e.target === cm) closeEditCoverModal();
+        });
+    </script>
+</body>
+</html>

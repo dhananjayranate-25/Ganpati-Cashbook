@@ -1,0 +1,12 @@
+node_modules/
+uploads/*
+!uploads/.gitkeep
+merged-cache/*
+!merged-cache/.gitkeep
+cashbook.db
+server.log
+nul
+temp_*
+script_backup.js
+script_temp.js
+*.otf

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shivsrushti - Cashbook Entry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div id="loginScreen" class="login-screen">
+            <div class="login-box animate-fade-up">
+                <div class="login-logo">
+                    <img src="logo/logo.jpeg" alt="Shivsrushti Logo" class="login-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🙏</text></svg>';this.classList.add('fallback-icon')">
+                </div>
+                <h2>User Login</h2>
+                <form id="loginForm">
+                    <div class="form-group floating-label">
+                        <input type="text" id="username" placeholder=" " required>
+                        <label for="username">Username</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <div class="form-group floating-label">
+                        <input type="password" id="password" placeholder=" " required>
+                        <label for="password">Password</label>
+                        <div class="input-focus-line"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary ripple" style="width: 100%; justify-content: center;">
+                        <span class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5l-5 5v-5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="9 10 12 13 15 10"/>
+                            </svg>
+                        </span>
+                        Login
+                    </button>
+                </form>
+                <p class="login-hint">Default: admin / admin123</p>
+            </div>
+        </div>
+
+        <div id="mainScreen" class="main-screen" style="display: none;">
+            <header class="animate-fade-down">
+                <div class="header-decoration">
+                    <div class="decoration-line left"></div>
+                    <div class="decoration-line right"></div>
+                </div>
+                <div class="header-content">
+                    <div class="ganpati-image-container">
+                        <img src="logo/logo.jpeg" alt="Shivsrushti Logo" class="ganpati-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🙏</text></svg>';this.classList.add('fallback-icon')">
+                    </div>
+                    <h1 class="title-gradient">Cashbook Entry</h1>
+                    <div class="subtitle-wrapper">
+                        <span class="subtitle-badge">Shivsrushti Hindu Tarun Mitra Mandal</span>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <span>Welcome, <strong id="loggedUser">User</strong></span>
+                    <button class="btn btn-secondary ripple" onclick="logout()" style="padding: 8px 16px; font-size: 0.85rem;">
+                        <span class="btn-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                        </span>
+                        Logout
+                    </button>
+                </div>
+                <div class="wave-divider">
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
+                        <path d="M0,50 C360,100 720,0 1080,50 C1260,75 1380,60 1440,50 L1440,100 L0,100 Z" fill="var(--bg-primary)"></path>
+                    </svg>
+                </div>
+            </header>
+
+            <div class="entry-panels animate-fade-up" style="animation-delay: 0.2s;">
+                <div class="section-header">
+                    <div class="header-line"></div>
+                    <h2>Panel 1</h2>
+                    <div class="header-line"></div>
+                </div>
+                <div class="form-container" style="margin-bottom: 30px;">
+                    <form id="entryForm1">
+                        <div class="form-grid">
+                            <div class="form-group floating-label">
+                                <input type="text" id="name1" placeholder=" " required>
+                                <label for="name1">Remark (Name / Purpose)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="number" id="year1" placeholder=" " min="2021" max="2050" value="2026" onchange="updateDate(1)">
+                                <label for="year1">Select Year</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="date" id="date1" required>
+                                <label for="date1">Date</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label select-group">
+                                <select id="mode1" required>
+                                    <option value="">Select Mode</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Cash">Cash</option>
+                                </select>
+                                <label for="mode1">Mode</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="number" id="cashIn1" placeholder=" " min="0" step="0.01">
+                                <label for="cashIn1">Cash In (+)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="number" id="cashOut1" placeholder=" " min="0" step="0.01">
+                                <label for="cashOut1">Cash Out (-)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary ripple">
+                                <span class="btn-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"/>
+                                    </svg>
+                                </span>
+                                Add Entry
+                            </button>
+                            <button type="button" class="btn btn-secondary ripple" onclick="resetForm(1)">
+                                <span class="btn-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                        <path d="M3 3v5h5"/>
+                                    </svg>
+                                </span>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="section-header">
+                    <div class="header-line"></div>
+                    <h2>Panel 2</h2>
+                    <div class="header-line"></div>
+                </div>
+                <div class="form-container">
+                    <form id="entryForm2">
+                        <div class="form-grid">
+                            <div class="form-group floating-label">
+                                <input type="text" id="name2" placeholder=" " required>
+                                <label for="name2">Remark (Name / Purpose)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="number" id="year2" placeholder=" " min="2021" max="2050" value="2026" onchange="updateDate(2)">
+                                <label for="year2">Select Year</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="date" id="date2" required>
+                                <label for="date2">Date</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label select-group">
+                                <select id="mode2" required>
+                                    <option value="">Select Mode</option>
+                                    <option value="Online">Online</option>
+                                    <option value="Cash">Cash</option>
+                                </select>
+                                <label for="mode2">Mode</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="number" id="cashIn2" placeholder=" " min="0" step="0.01">
+                                <label for="cashIn2">Cash In (+)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                            <div class="form-group floating-label">
+                                <input type="number" id="cashOut2" placeholder=" " min="0" step="0.01">
+                                <label for="cashOut2">Cash Out (-)</label>
+                                <div class="input-focus-line"></div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary ripple">
+                                <span class="btn-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"/>
+                                    </svg>
+                                </span>
+                                Add Entry
+                            </button>
+                            <button type="button" class="btn btn-secondary ripple" onclick="resetForm(2)">
+                                <span class="btn-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                        <path d="M3 3v5h5"/>
+                                    </svg>
+                                </span>
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div style="position: fixed; bottom: 0; left: 0; z-index: 100; margin: 15px;">
+                <a href="admin.html" class="btn btn-admin ripple">
+                    <span class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h6a6 6 0 016 6v1h-6z"/>
+                        </svg>
+                    </span>
+                    Go to Admin Panel
+                </a>
+            </div>
+            <footer class="animate-fade-up" style="animation-delay: 0.6s;">
+                <div class="footer-marathi">
+                    <div class="footer-marathi-top">
+                        <span class="footer-om-large">ॐ</span>
+                        <span class="footer-mantra">गण गणपतये नमः</span>
+                        <span class="footer-om-large">॥ हर हर महादेव ॥</span>
+                    </div>
+                    <div class="footer-divider-gold"></div>
+                    <div class="footer-marathi-middle">
+                        <p>गणपती बाप्पा मोरया | मंगलमूर्ती मोरया |</p>
+                        <p>शिवसृष्टी Boyz - शिवसृष्टी उत्सव कॅशबुक</p>
+                    </div>
+                    <div class="footer-divider-gold"></div>
+                    <div class="footer-marathi-bottom">
+                        <p class="footer-credit">Developed by <strong>Dhananjay Ranate</strong></p>
+                    </div>
+
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="user.js"></script>
+</body>
+</html>
